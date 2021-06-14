@@ -1,0 +1,34 @@
+#* @vtlvariable name="action" type="ru.smartslame.migrator.action.ShowIssuesToMigrateAction" *#
+
+<html>
+<head>
+    <title>Issues to migrate</title>
+    <meta name="decorator" content="atl.admin">
+</head>
+<body>
+<table width="100%" cellspacing="0" cellpadding="10" border="0">
+    <tbody>
+    <tr>
+        <td>
+            <table class="jiraform maxWidth">
+                <thead class="jiraformheader">
+                <tr>
+                    <th>Project key</th>
+                    <th>Issue key</th>
+                </tr>
+                </thead>
+                <tbody id="issues">
+                    #foreach ( $issue in $action.getAll() )
+                    <tr>
+                        <td align="center">$issue.projectKey</td>
+                        <td align="center">$issue.issueKey</td>
+                    </tr>
+                    #end
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

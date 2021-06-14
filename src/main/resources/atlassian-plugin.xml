@@ -1,0 +1,76 @@
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+    </plugin-info>
+
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="migrator"/>
+
+    <!-- add our web resources -->
+    <web-resource key="migrator-resources" name="migrator Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <resource type="download" name="images/" location="/images"/>
+
+        <context>migrator</context>
+    </web-resource>
+
+    <ao key="ao-module">
+        <description>The module configuring the Active Objects service used by this plugin</description>
+        <entity>ru.smartslame.migrator.ao.entity.IssueToMigrateEntity</entity>
+        <entity>ru.smartslame.migrator.ao.entity.NeoMigrationJobEntity</entity>
+        <entity>ru.smartslame.migrator.ao.entity.ProjectToMigrateEntity</entity>
+    </ao>
+
+    <web-section key="migrator_section" name="Migrator plugin configuration"
+                 i18n-name-key="migrator.section"
+                 location="top_system_section" weight="10">
+        <label key="migrator.section"/>
+    </web-section>
+
+    <web-item key="show_issues_link" section="top_system_section/migrator_section"
+              i18n-name-key="show.issues.link"
+              name="Issues to migrate"
+              weight="3">
+        <link linkId="show_issues_link">/secure/admin/ShowIssuesToMigrateAction.jspa</link>
+        <label key="show.issues.link"/>
+    </web-item>
+
+    <web-item key="neo4j_connector" section="top_system_section/migrator_section"
+              i18n-name-key="neo4j.connector"
+              name="Neo4j connector"
+              weight="1">
+        <link linkId="neo4j_connector">/secure/admin/Neo4jConnectionAction.jspa</link>
+        <label key="neo4j.connector"/>
+    </web-item>
+
+    <web-item key="manage_job_link" section="top_system_section/migrator_section"
+              i18n-name-key="manage.job.link"
+              name="Job manager"
+              weight="2">
+        <link linkId="manage_job_link">/secure/admin/MigrationJobMonitorAction.jspa</link>
+        <label key="manage.job.link"/>
+    </web-item>
+
+    <webwork1 key="migrator_webwork" name="Migrator webwork">
+        <actions>
+            <action name="ru.smartslame.migrator.action.ShowIssuesToMigrateAction"
+                    alias="ShowIssuesToMigrateAction">
+                <view name="success">/templates/showIssuesToMigrate.vm</view>
+            </action>
+            <action name="ru.smartslame.migrator.action.Neo4jConnectionAction"
+                    alias="Neo4jConnectionAction">
+                <view name="success">/templates/neo4jConnector.vm</view>
+            </action>
+            <action name="ru.smartslame.migrator.action.MigrationJobMonitorAction"
+                    alias="MigrationJobMonitorAction">
+                <view name="success">/templates/jobManager.vm</view>
+            </action>
+        </actions>
+    </webwork1>
+
+
+</atlassian-plugin>

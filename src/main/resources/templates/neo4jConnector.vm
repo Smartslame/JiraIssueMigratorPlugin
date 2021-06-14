@@ -1,0 +1,57 @@
+<html>
+<head>
+    <title>Neo4j connector</title>
+    <meta name="decorator" content="atl.admin">
+</head>
+<body>
+<table width="100%" cellspacing="0" cellpadding="10" border="0">
+    <tbody>
+    <tr>
+        <td>
+            <table class="jiraform maxWidth">
+                <tbody>
+                <tr>
+                    <td class="jiraformheader">
+                        <h3 class="formtitle">Neo4j connector</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="jiraformbody">
+                        <form method="post" action="Neo4jConnectionAction!connect.jspa">
+                            <p>
+                            <table>
+                                <tr>
+                                    <td>URL</td>
+                                    <td><input type="text" name="url" value="$url"></td>
+                                </tr>
+                                <tr>
+                                    <td>USER</td>
+                                    <td><input type="text" name="user" value="$user"></td>
+                                </tr>
+                                <tr>
+                                    <td>PASSWORD</td>
+                                    <td><input type="text" name="password"></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="submit" value="Connect"></td>
+                                    #if( $connected )
+                                        <td><input style="background-color:greenyellow" type="submit" value="Connection succeeded" disabled="disabled"></td>
+                                    #else
+                                        <td><input style="background-color:red" type="submit" value="Connection failed" disabled="disabled"></td>
+                                    #end
+                                </tr>
+                            </table>
+                            </p>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p>
+            </p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
