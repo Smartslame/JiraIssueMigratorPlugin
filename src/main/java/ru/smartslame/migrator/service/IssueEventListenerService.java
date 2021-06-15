@@ -15,7 +15,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.smartslame.migrator.ao.dao.IssueToMigrateDao;
-import ru.smartslame.migrator.neo4j.factory.NeoIssueFactory;
+import ru.smartslame.migrator.ao.dao.ProjectToMigrateDao;
 
 @Component
 public class IssueEventListenerService implements InitializingBean, DisposableBean {
@@ -25,14 +25,14 @@ public class IssueEventListenerService implements InitializingBean, DisposableBe
     private final EventPublisher eventPublisher;
 
     private final IssueToMigrateDao issueToMigrateDao;
+    private final ProjectToMigrateDao projectToMigrateDao;
 
-    private final NeoIssueFactory neoIssueFactory;
 
     @Autowired
-    public IssueEventListenerService(EventPublisher eventPublisher, IssueToMigrateDao issueToMigrateDao, NeoIssueFactory neoIssueFactory) {
+    public IssueEventListenerService(EventPublisher eventPublisher, IssueToMigrateDao issueToMigrateDao, ProjectToMigrateDao projectToMigrateDao) {
         this.eventPublisher = eventPublisher;
         this.issueToMigrateDao = issueToMigrateDao;
-        this.neoIssueFactory = neoIssueFactory;
+        this.projectToMigrateDao = projectToMigrateDao;
     }
 
     @Override
@@ -51,7 +51,9 @@ public class IssueEventListenerService implements InitializingBean, DisposableBe
         Issue issue = issueEvent.getIssue();
         logger.debug("Event type id : {}", eventTypeId);
         logger.debug("Issue : {}", issue.getKey());
-        issueToMigrateDao.create(issue.getProjectObject().getKey(), issue.getKey());
+        if (projectToMigrateDao.contains(issue.getProjectObject().getKey())) {
+            issueToMigrateDao.create(issue.getProjectObject().getKey(), issue.getKey());
+        }
     }
 
     @EventListener
@@ -62,7 +64,9 @@ public class IssueEventListenerService implements InitializingBean, DisposableBe
         logger.debug(String.format("From issue: %s", sourceIssue.getKey()));
         logger.debug(String.format("To issue: %s", issueLink.getDestinationObject().getKey()));
         logger.debug(String.format("Link type: %s", issueLink.getIssueLinkType().getName()));
-        issueToMigrateDao.create(sourceIssue.getProjectObject().getKey(), sourceIssue.getKey());
+        if (projectToMigrateDao.contains(sourceIssue.getProjectObject().getKey())) {
+            issueToMigrateDao.create(sourceIssue.getProjectObject().getKey(), sourceIssue.getKey());
+        }
     }
 
     @EventListener
@@ -73,7 +77,9 @@ public class IssueEventListenerService implements InitializingBean, DisposableBe
         logger.debug(String.format("From issue: %s", sourceIssue.getKey()));
         logger.debug(String.format("To issue: %s", issueLink.getDestinationObject().getKey()));
         logger.debug(String.format("Link type: %s", issueLink.getIssueLinkType().getName()));
-        issueToMigrateDao.create(sourceIssue.getProjectObject().getKey(), sourceIssue.getKey());
+        if (projectToMigrateDao.contains(sourceIssue.getProjectObject().getKey())) {
+            issueToMigrateDao.create(sourceIssue.getProjectObject().getKey(), sourceIssue.getKey());
+        }
     }
 
 }
