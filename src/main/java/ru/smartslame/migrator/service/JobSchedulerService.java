@@ -7,6 +7,7 @@ import com.atlassian.scheduler.config.JobConfig;
 import com.atlassian.scheduler.config.JobId;
 import com.atlassian.scheduler.config.RunMode;
 import com.atlassian.scheduler.config.Schedule;
+import com.google.common.collect.ImmutableMap;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,21 +15,20 @@ import org.springframework.stereotype.Component;
 import ru.smartslame.migrator.ao.entity.NeoMigrationJobEntity;
 import ru.smartslame.migrator.scheduling.NeoMigrationJobRunner;
 import ru.smartslame.migrator.scheduling.NeoMigrationJobRunnerImpl;
-import ru.smartslame.migrator.scheduling.job.Job;
+import ru.smartslame.migrator.scheduling.job.JobType;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Date;
 
 @Component
-public class NeoMigrationJobMonitorService implements InitializingBean {
-    private final Logger logger = Logger.getLogger(NeoMigrationJobMonitorService.class);
+public class JobSchedulerService implements InitializingBean {
+    private final Logger logger = Logger.getLogger(JobSchedulerService.class);
     @JiraImport
     private final SchedulerService schedulerService;
     private final NeoMigrationJobRunner neoMigrationJobRunner;
 
     @Autowired
-    public NeoMigrationJobMonitorService(SchedulerService schedulerService, NeoMigrationJobRunner neoMigrationJobRunner) {
+    public JobSchedulerService(SchedulerService schedulerService, NeoMigrationJobRunner neoMigrationJobRunner) {
         this.schedulerService = schedulerService;
         this.neoMigrationJobRunner = neoMigrationJobRunner;
     }
@@ -40,11 +40,13 @@ public class NeoMigrationJobMonitorService implements InitializingBean {
 
     public void schedule(NeoMigrationJobEntity neoMigrationJobEntity) {
         JobConfig jobConfig = JobConfig.forJobRunnerKey(NeoMigrationJobRunnerImpl.JOB_RUNNER_KEY)
-                .withParameters(Collections.singletonMap(NeoMigrationJobRunner.PROJECT_KEY, neoMigrationJobEntity.getProjectKey()))
+                .withParameters(ImmutableMap.of(
+                        NeoMigrationJobRunner.PROJECT_KEY, neoMigrationJobEntity.getProjectKey(),
+                        JobType.JOB_TYPE_KEY, JobType.MIGRATION))
                 .withSchedule(Schedule.forInterval(Integer.parseInt(neoMigrationJobEntity.getSchedule()) * 1000 * 60, Date.from(Instant.now())))
                 .withRunMode(RunMode.RUN_LOCALLY);
 
-        JobId jobId = JobId.of(neoMigrationJobEntity.getProjectKey() + Job.JOB_ID_SUFFIX);
+        JobId jobId = JobId.of(neoMigrationJobEntity.getProjectKey() + "_" + JobType.MIGRATION);
 
         try {
             schedulerService.scheduleJob(jobId, jobConfig);
@@ -56,7 +58,7 @@ public class NeoMigrationJobMonitorService implements InitializingBean {
     }
 
     public void unschedule(String projectKey) {
-        JobId jobId = JobId.of(projectKey + Job.JOB_ID_SUFFIX);
+        JobId jobId = JobId.of(projectKey + JobType.MIGRATION);
 
         schedulerService.unscheduleJob(jobId);
 

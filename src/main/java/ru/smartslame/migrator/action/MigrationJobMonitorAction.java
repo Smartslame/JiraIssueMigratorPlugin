@@ -8,13 +8,13 @@ import ru.smartslame.migrator.ao.dao.NeoMigrationJobDao;
 import ru.smartslame.migrator.ao.dao.ProjectToMigrateDao;
 import ru.smartslame.migrator.ao.entity.NeoMigrationJobEntity;
 import ru.smartslame.migrator.service.IssueToMigrateFullerService;
-import ru.smartslame.migrator.service.NeoMigrationJobMonitorService;
+import ru.smartslame.migrator.service.JobSchedulerService;
 
 import java.util.Objects;
 
 public class MigrationJobMonitorAction extends JiraWebActionSupport {
     private final Logger logger = Logger.getLogger(MigrationJobMonitorAction.class);
-    private final NeoMigrationJobMonitorService neoMigrationJobMonitorService;
+    private final JobSchedulerService jobSchedulerService;
     private final NeoMigrationJobDao neoMigrationJobDao;
     private final ProjectToMigrateDao projectToMigrateDao;
     private final IssueToMigrateFullerService issueToMigrateFullerService;
@@ -23,8 +23,8 @@ public class MigrationJobMonitorAction extends JiraWebActionSupport {
     private boolean fullUpdate;
 
     @Autowired
-    public MigrationJobMonitorAction(NeoMigrationJobMonitorService neoMigrationJobMonitorService, NeoMigrationJobDao neoMigrationJobDao, ProjectToMigrateDao projectToMigrateDao, IssueToMigrateFullerService issueToMigrateFullerService) {
-        this.neoMigrationJobMonitorService = neoMigrationJobMonitorService;
+    public MigrationJobMonitorAction(JobSchedulerService jobSchedulerService, NeoMigrationJobDao neoMigrationJobDao, ProjectToMigrateDao projectToMigrateDao, IssueToMigrateFullerService issueToMigrateFullerService) {
+        this.jobSchedulerService = jobSchedulerService;
         this.neoMigrationJobDao = neoMigrationJobDao;
         this.projectToMigrateDao = projectToMigrateDao;
         this.issueToMigrateFullerService = issueToMigrateFullerService;
@@ -43,20 +43,20 @@ public class MigrationJobMonitorAction extends JiraWebActionSupport {
         }
         projectToMigrateDao.create(projectKey);
         NeoMigrationJobEntity neoMigrationJobEntity = neoMigrationJobDao.create(projectKey, schedule);
-        neoMigrationJobMonitorService.schedule(neoMigrationJobEntity);
+        jobSchedulerService.schedule(neoMigrationJobEntity);
         return getRedirect("MigrationJobMonitorAction.jspa");
     }
 
     public String doDelete() {
         neoMigrationJobDao.deleteByProjectKey(projectKey);
         projectToMigrateDao.deleteByProjectKey(projectKey);
-        neoMigrationJobMonitorService.unschedule(projectKey);
+        jobSchedulerService.unschedule(projectKey);
         return getRedirect("MigrationJobMonitorAction.jspa");
     }
 
     public String doReschedule() {
         NeoMigrationJobEntity neoMigrationJobEntity = neoMigrationJobDao.update(projectKey, schedule);
-        neoMigrationJobMonitorService.schedule(neoMigrationJobEntity);
+        jobSchedulerService.schedule(neoMigrationJobEntity);
         return getRedirect("MigrationJobMonitorAction.jspa");
     }
 

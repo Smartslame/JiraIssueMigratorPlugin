@@ -37,7 +37,6 @@ public class MigrationJob implements Job {
             if (!issueKeysSet.contains(issueKey.getIssueKey())) {
                 NeoIssue neoIssue = neoIssueFactory.create(issueKey.getIssueKey());
                 neoIssueDao.update(neoIssue);
-            } else {
                 issueKeysSet.add(issueKey.getIssueKey());
             }
 
@@ -45,5 +44,10 @@ public class MigrationJob implements Job {
 
 
         }
+    }
+
+    @Override
+    public String getJobType() {
+        return JobType.MIGRATION;
     }
 }
