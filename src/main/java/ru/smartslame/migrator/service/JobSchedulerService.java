@@ -58,7 +58,7 @@ public class JobSchedulerService implements InitializingBean {
     }
 
     public void unschedule(String projectKey) {
-        JobId jobId = JobId.of(projectKey + JobType.MIGRATION);
+        JobId jobId = JobId.of(projectKey + "_" + JobType.MIGRATION);
 
         schedulerService.unscheduleJob(jobId);
 
